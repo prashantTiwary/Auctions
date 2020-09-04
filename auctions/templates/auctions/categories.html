@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+{% block body %}
+<h2>Categories</h2>
+
+
+
+<div class="text-white mb-3" style="max-width: 18rem;">
+  <div class="card-body text-info text-center">
+        {% for category in categories %}
+        <ul>
+            <li style="padding: 5px 10px;border: 1px solid #DDDDDD;">
+              <a href="{% url 'category_list' category %}" class="btn">{{ category }} </a>
+            </li>
+        </ul>
+        {% endfor %}
+
+  </div>
+</div>
+
+
+
+{% endblock %}
+ssssss

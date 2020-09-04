@@ -1,0 +1,163 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="row">
+      <div class="col-sm-6">
+        <div class="card bg-light card border-success mb-3" style="max-width: 35rem;">
+          <div class="card-header text-center"><h2>{{ listing.title }}</h2></div>
+          <img class="card-img-top" src="{{ listing.image_url }}"><br>
+          <div class="card-body">
+            <h3 class="bold text-info" >Starting Price:
+                <small class ="text-muted"> ₹ {{ listing.starting_bid}}</small>
+            </h3><br>
+            <h3 class="bold text-info">Category: <small class=text-muted>{{ listing.category }}</small></h3><br>
+        <h3 class="text-info">Description:<small class=text-muted>{{ listing.description }}</small></h4><br>
+
+        <div class="card-footer bg-transparent border-success text-center">
+          {% if user.is_authenticated and listing.active and not listing.user == user %}
+
+          <form action="{% url 'watchlist_action' listing.id %}" method = "POST">
+          {% csrf_token %}
+          <button type="submit" style = " background-color:#333333; color:white; border-radius:1vw;"> +/- Watchlist</button>
+          </form>
+
+        {% endif %}
+        </div>
+
+    </div>
+    </div>
+  </div>
+
+
+    <div class="col-sm-6">
+      <br><br>
+
+
+        <div class="card border-danger bg-info mb-3 text-center" style="max-width: 22rem;">
+
+          {% if listing.active %}
+          <h3 class="text-white">STATUS: <small class="bold" style="color:#33ff33;">Active</small></h3>
+
+          {% else %}
+          <h3 class="text-white">STATUS: <small class="bold" style="color:#33ff33;">Closed</small></h3>
+          {% endif %}
+
+        </div><br>
+
+
+          {% if not listing.active %}
+          <div class="card border-danger mb-3 bg-info text-white text-center" style="max-width:22rem;" >
+          <h3>
+            {% if winner.user == user %}
+            You are the winner!
+            {% else %}
+            The  winner is {{ winner.user }}!
+            {% endif %}
+          </h3>
+
+          </div>
+          {% endif %}
+
+        <br>
+
+
+
+      <div class="card border-danger mb-3 bg-info text-white text-center" style="max-width:22rem;">
+          <h3 class="text-white">Current Price: <small class="bold" style="color:#33ff33;"> ₹ {{ listing.price }}</small></h3>
+
+      </div><br><br>
+
+      {% if request.user.is_authenticated and listing.active %}
+      <div class="card border-info mb-3 bg-light text-white text-center" style="max-width:22rem;">
+
+        <form action="{% url 'listing' listing.pk %}" method="post">
+              {% csrf_token %}
+              <div class="card-header">
+                <h3 class="text-info">Bidding Box</h3>
+
+              </div>
+              <div class="card-body">
+                <h3 class="text-warning">Bid for this item!</h3>
+                <input class="form-control" type="number" name="bid" placeholder="Enter bid amount!">
+              </div>
+
+                  <br>
+                  <input type="submit" class="btn btn-dark" value="Place Bid"><br><br>
+
+
+          </form>
+      </div>
+
+
+      {% endif %}<br><br>
+
+      {% if messages %}
+       <ul >
+           {% for message in messages %}
+           {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR and message.extra_tags == 'bid' %}
+           <li class="float-left text-danger">Error : {{ message }}</li>
+           {% endif %}
+           {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS and message.extra_tags == 'bid' %}
+           <li class="float-left text-success">Success : {{ message }}</li>
+           {% endif %}
+           {% endfor %}
+       </ul>
+       {% endif %}<br>
+
+
+      {% if request.user.is_authenticated and listing.active and owner %}
+           <form class="text-center"action="{% url 'listing' listing.pk %}" method="post">
+               {% csrf_token %}
+
+            <button class="btn btn-danger" type="submit" name="close">Close Auction</button>
+
+
+           </form><br><br>
+           {% endif %}
+
+        </div>
+      </div><br><br>
+
+      <div class="dropdown-divider"></div>
+        <div class="row">
+        <div class="col-sm-6">
+
+          <div class="comment">
+            <h3 class="text-info">Post Comments : </h3>
+            {% if request.user.is_authenticated %}
+            <div class="card">
+              <div class="card-body text-center">
+
+                <form action="{% url 'listing' listing.pk %}" method="post">
+                    {% csrf_token %}
+                    <div >
+                        <input class="form-control" type="text" name="comment" placeholder="Add a comment here!!"><br>
+                        <input type="submit" class="btn btn-success" value="Comment"><br>
+
+                    </div>
+              </div><br>
+
+            </div><br><br>
+
+                    <h3 class="text-info">Comments Section:</h3>
+                    <div class="card">
+                      <div class="card-body">
+                        {% for comment in comments %}
+
+                         <h5><span class="bold text-danger">{{ comment.user }} :   </span> {{ comment.comments }}</h5>
+                         <div class="dropdown-divider"></div>
+                        {% endfor %}
+                      </div>
+
+                   </div>
+              {% endif %}
+
+          </div>
+
+        </div>
+
+</div>
+</div>
+{% endblock %}
